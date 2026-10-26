@@ -101,17 +101,23 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
   }
 
   const surfaceGrip = grip[before.surface];
+  // Surface grip affects how efficiently pedal torque reaches the ground.
+  // Loose scree still rolls quickly downhill, but wastes more drive and braking force.
+  const driveTraction = { rock: .9, dirt: 1, grass: .76, scree: .68 }[before.surface];
+  const brakeTraction = .68 + surfaceGrip * .32;
   const boosting = input.boost && state.boost > .005;
   if (boosting) state.boost = Math.max(0, state.boost - dt * .18);
   else state.boost = Math.min(1, state.boost + dt * .012);
 
   // Gravity, rolling losses and aerodynamic drag share units of m/s².
   const downhill = clamp(-before.slope, -.8, .95);
-  const push = (input.pedal ? 6.1 : .9) + (state.bikeClass === 'sprinter' && input.pedal ? .9 : 0);
+  const pedalForce = input.pedal ? 6.1 : .9;
+  const classBonus = state.bikeClass === 'sprinter' && input.pedal ? .9 : 0;
+  const push = (pedalForce + classBonus) * (input.pedal ? driveTraction : 1);
   const rolling = rollingResistance[before.surface];
-  let acceleration = downhill * 17 + push + (boosting ? 11 : 0)
+  let acceleration = downhill * 17 + push + (boosting ? 11 * driveTraction : 0)
     - rolling - state.speed * state.speed * .005;
-  if (input.brake) acceleration -= 17 + state.speed * .19;
+  if (input.brake) acceleration -= (12 + state.speed * .19) * brakeTraction;
   if (Math.abs(state.lateral) > before.width * .48) acceleration -= 4.2;
   if (state.airborne) acceleration = (boosting ? 2 : 0) - state.speed * .018;
   state.speed = clamp(state.speed + acceleration * dt, 0, (boosting ? 43 : 35) + (state.bikeClass === 'sprinter' ? 3 : 0));
@@ -198,8 +204,11 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
       // Forgiving ordinary jumps; committing to half a flip has real consequences.
       const badRotation = (m.trickId === 6 || m.trickId === 7) && angleError > 1.18;
       state.airborne = false; state.y = 0; state.vy = 0; m.worldY = ground;
-      m.suspensionVelocity = Math.min(12, impact * .65);
-      state.compression = Math.min(.95, .2 + impact * .025);
+      // A landing is a suspension impulse, not an instant visual snap. Softer
+      // grass absorbs a little more travel; rock transfers a sharper hit.
+      const suspensionTravel = sample.surface === 'grass' ? 1.12 : sample.surface === 'scree' ? 1.06 : sample.surface === 'rock' ? .88 : 1;
+      m.suspensionVelocity = Math.min(15, impact * .72 * suspensionTravel);
+      state.compression = Math.min(.82, .12 + impact * .018 * suspensionTravel);
       events.push({ type: 'land', force: impact });
       if (badRotation || impact > 39) {
         state.crash = 1.45; m.recoveryTime = 0;
