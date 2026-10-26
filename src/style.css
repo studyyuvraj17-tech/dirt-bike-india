@@ -75,3 +75,8 @@
   .leaderboard, .progress-panel { backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
   .ride-btn { min-height: 56px; }
 }
+
+
+/* Daily challenge + persistent reward loop. */
+.daily-card{width:335px;padding:12px 14px 11px;margin:-8px 0 17px;background:#173d37e8;color:#fff0cd;border-left:3px solid #ed804b;box-shadow:4px 4px 0 #173d3720}.daily-top{display:flex;align-items:center;justify-content:space-between;font-size:8px;letter-spacing:1.3px;color:#f7bf7c}.daily-top b{font-size:7px;letter-spacing:1px}.daily-card>strong{display:block;margin-top:7px;font-size:13px;letter-spacing:1.5px}.daily-card p{font-size:10px;margin:4px 0 7px;opacity:.82}.daily-card>small{font-size:7px;letter-spacing:1.2px;opacity:.72}.daily-card i{font-style:normal;margin:0 5px;color:#ed804b}.daily-result{margin:0 0 18px;padding:12px;background:#f2b96b16;border:1px solid #f2b96b50}.daily-result>div>b{display:block;color:#f4bd78;font-size:9px;letter-spacing:1.4px}.daily-result>div>span{display:block;margin-top:5px;font-size:10px;opacity:.8}.daily-result>strong{display:block;margin-top:8px;font-size:15px;color:#f4bd78}.daily-result>small{display:block;margin-top:4px;font-size:8px;letter-spacing:1px;opacity:.65}
+@media(max-width:800px){.daily-card{width:min(100%,335px);padding:9px 11px;margin:-6px 0 12px}.daily-card>strong{font-size:11px}.daily-card p{font-size:9px}.title-panel{top:16%}h1{font-size:clamp(52px,11vw,70px);margin:16px 0}.title-panel>p{margin:13px 0 18px}.course-stats{margin:14px 0 20px;gap:20px}.course-stats b{font-size:18px}.course-stats span{font-size:6px}.title-hint{display:none}}
