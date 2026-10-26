@@ -3,7 +3,7 @@ export type Phase='title'|'countdown'|'racing'|'paused'|'results';
 export interface HudState {phase:Phase;player:RiderState;riders:RiderState[];time:number;countdown:number;world:World;best:number;split:string;fps:number;replay:boolean;}
 
 type DailyChallenge={id:string;title:string;goal:string;reward:number;test:(score:number,place:number,seconds:number)=>boolean};
-const dailyChallenge=():DailyChallenge=>{
+const dailyChallenge=():DailyChallenge & {date:string}=>{
   const now=new Date(),key=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
   const day=Math.floor(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())/86400000);
   const challenges:DailyChallenge[]=[
