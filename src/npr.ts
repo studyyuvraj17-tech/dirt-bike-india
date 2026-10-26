@@ -61,18 +61,20 @@ const fragment = /* glsl */`
     vec4 shadowP=uShadowMatrix*vec4(vWorld,1.0);vec3 sc=shadowP.xyz/shadowP.w;
     if(uShadowEnabled>0.5 && all(greaterThan(sc,vec3(0.0))) && all(lessThan(sc,vec3(1.0)))){float stored=texture(uShadowMap,sc.xy).r;float shade=step(stored+0.002,sc.z);l=mix(l,min(l,0.44),shade);}
     l*=uCloudShade;
-    float band = step(uThresholds.x,l) + step(uThresholds.y,l) + step(uThresholds.z,l);
-    vec3 ramp = texture(uRamp, vec2((band+0.5)/4.0,0.5)).rgb;
+    // Blend the four material tones instead of snapping every surface to hard cel bands.
+    // This keeps the illustrated identity, but gives terrain and bike parts rounder light.
+    float shade = smoothstep(0.12,0.96,l);
+    vec3 ramp = texture(uRamp, vec2(shade,0.5)).rgb;
     vec3 col = uColor * vTint * ramp;
     // Two-pixel ink hatching in the deepest two bands, anchored to the screen.
-    float hatch = step(0.76, fract((gl_FragCoord.x + gl_FragCoord.y * 0.63)/7.0));
-    col *= 1.0 - hatch * uHatch * (1.0-step(1.5,band));
+    float hatch = step(0.82, fract((gl_FragCoord.x + gl_FragCoord.y * 0.63)/9.0));
+    col *= 1.0 - hatch * uHatch * 0.32;
     vec3 eye = normalize(-vView);
     float rim = pow(1.0-max(0.0,dot(n,eye)),3.0);
     col += vec3(1.0,0.78,0.37)*step(0.53,rim)*uRim*max(0.2,dot(n,light));
     // Crisp painted highlight shapes; never a PBR BRDF or environment probe.
     float spec = dot(n, normalize(light+eye));
-    col += vec3(1.0,0.91,0.66)*step(0.965,spec)*uSpec;
+    col += vec3(1.0,0.91,0.72)*smoothstep(0.91,0.985,spec)*uSpec*0.72;
     // A quantized sky/ground reflection remains visible when SSR has no hit.
     if(uReflect>0.0){
       vec3 reflected=reflect(-eye,n);
@@ -82,7 +84,7 @@ const fragment = /* glsl */`
       col=mix(col,painted,uReflect*(.18+rim*.22));
     }
     float depth = max(0.0,-vView.z);
-    float fog = floor(clamp((depth-120.0)/2350.0,0.0,0.88)*7.0)/7.0;
+    float fog = smoothstep(120.0,2470.0,depth)*0.78;
     col = mix(col,uFog,fog);
     outColor = vec4(col,1.0);
     outNormalDepth = vec4(n*0.5+0.5,depth/10000.0);
@@ -98,7 +100,8 @@ function rampFor(kind:string) {
   const data = new Uint8Array(16);
   for(let i=0;i<4;i++){for(let j=0;j<3;j++)data[i*4+j]=Math.round(shades[i*3+j]*255);data[i*4+3]=255;}
   const t=new THREE.DataTexture(data,4,1,THREE.RGBAFormat);
-  t.minFilter=t.magFilter=THREE.NearestFilter;t.needsUpdate=true;ramps.set(kind,t);return t;
+  // Linear sampling softly blends the material's shadow, midtone and highlight colours.
+  t.minFilter=t.magFilter=THREE.LinearFilter;t.needsUpdate=true;ramps.set(kind,t);return t;
 }
 export function createMaterial(color:number,kind='dirt'):THREE.ShaderMaterial {
   const shiny = kind==='metal'||kind==='helmet';
@@ -108,7 +111,7 @@ export function createMaterial(color:number,kind='dirt'):THREE.ShaderMaterial {
     vertexColors: kind==='terrain',
     uniforms:{...globalUniforms,uColor:{value:new THREE.Color(color)},uRamp:{value:rampFor(kind)},
       uThresholds:{value:new THREE.Vector3(kind==='foliage'?0.28:0.32,0.56,kind==='rock'?0.78:0.76)},
-      uTrackMask:{value:null},uMasked:{value:0},uTrackRegion:{value:new THREE.Vector4(-1600,-2400,3200,3200)},uReflect:{value:shiny?.65:kind==='water'?.5:0},uRim:{value:rider?0.16:0.025},uSpec:{value:shiny?0.30:0},uHatch:{value:kind==='skin'?0.025:kind==='terrain'?0.045:0.065}},
+      uTrackMask:{value:null},uMasked:{value:0},uTrackRegion:{value:new THREE.Vector4(-1600,-2400,3200,3200)},uReflect:{value:shiny?.65:kind==='water'?.5:0},uRim:{value:rider?0.10:0.018},uSpec:{value:shiny?0.24:0},uHatch:{value:kind==='skin'?0.012:kind==='terrain'?0.018:0.025}},
     side:kind==='foliage'||kind==='grass'?THREE.DoubleSide:THREE.FrontSide,
   });
 }
@@ -149,7 +152,7 @@ const hullFragment=/* glsl */`
   }
 `;
 /** Weld normals only for the hull: hard-edged cel facets remain on the actual mesh. */
-export function addOutline(mesh:THREE.Mesh,width=1.25):THREE.Mesh {
+export function addOutline(mesh:THREE.Mesh,width=0.82):THREE.Mesh {
   const geometry=mesh.geometry;
   if(!geometry.hasAttribute('outlineNormal')){
     const pos=geometry.getAttribute('position'),norm=geometry.getAttribute('normal');
