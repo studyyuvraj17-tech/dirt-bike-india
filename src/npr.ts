@@ -261,11 +261,19 @@ function makeLut(){
   const data=new Uint8Array(256*16*4);
   for(let b=0;b<16;b++)for(let g=0;g<16;g++)for(let r=0;r<16;r++){
     const i=(g*256+b*16+r)*4;
-    const rgb=[r/15,g/15,b/15];const l=rgb[0]*0.213+rgb[1]*0.715+rgb[2]*0.072;
-    const shadow=1-l;
-    data[i]=Math.round(THREE.MathUtils.clamp(rgb[0]*1.025+0.006*shadow,0,1)*255);
-    data[i+1]=Math.round(THREE.MathUtils.clamp(rgb[1]*1.005+0.010*shadow,0,1)*255);
-    data[i+2]=Math.round(THREE.MathUtils.clamp(rgb[2]*0.94+0.013*shadow,0,1)*255);data[i+3]=255;
+    // A restrained cinematic grade: deeper inked shadows, cleaner greens,
+    // and a warm sunlit highlight roll-off without crushing the cel ramps.
+    const source=[r/15,g/15,b/15];
+    const contrast=source.map(c=>THREE.MathUtils.clamp((c-.5)*1.075+.5,0,1));
+    const l=contrast[0]*.213+contrast[1]*.715+contrast[2]*.072;
+    const shadow=1-THREE.MathUtils.smoothstep(l,.02,.78);
+    const highlight=THREE.MathUtils.smoothstep(l,.48,.98);
+    const saturation=1.065;
+    const graded=contrast.map((c,k)=>l+(c-l)*saturation+[-.010,.004,.020][k]*shadow+[.022,.008,-.018][k]*highlight);
+    data[i]=Math.round(THREE.MathUtils.clamp(graded[0],0,1)*255);
+    data[i+1]=Math.round(THREE.MathUtils.clamp(graded[1],0,1)*255);
+    data[i+2]=Math.round(THREE.MathUtils.clamp(graded[2],0,1)*255);
+    data[i+3]=255;
   }
   const t=new THREE.DataTexture(data,256,16,THREE.RGBAFormat);t.minFilter=t.magFilter=THREE.LinearFilter;t.needsUpdate=true;return t;
 }
