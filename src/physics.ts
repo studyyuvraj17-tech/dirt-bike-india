@@ -118,7 +118,10 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
 
   const steer = clamp(input.steer, -1, 1);
   const slide = input.brake && state.speed > 12 ? .68 : 1;
-  const steeringTarget = steer * (2.3 + state.speed * .115) * (state.bikeClass === 'freeride' ? 1.12 : 1);
+  // Preserve quick low-speed line choice while reducing twitchiness at race speed.
+  // Brake slides remain looser, and the freeride class keeps a small agility bonus.
+  const speedSteering = 2.3 + Math.min(state.speed, 22) * .075 + Math.max(0, state.speed - 22) * .035;
+  const steeringTarget = steer * speedSteering * (state.bikeClass === 'freeride' ? 1.1 : 1);
   m.lateralVelocity = damp(m.lateralVelocity, steeringTarget,
     (state.airborne ? 2 : 7 * surfaceGrip * slide), dt);
   // A little centrifugal drift gives berms and brake slides readable consequences.
