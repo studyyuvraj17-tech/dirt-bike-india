@@ -72,6 +72,9 @@ export class Presentation {
       // Follow heading with a slower lateral spring so bends have a whip,
       // while vertical damping lets suspension motion read against the frame.
       this.desired.copy(pos).addScaledVector(sm.tangent,-5.9-speed*.7).addScaledVector(sm.right,-player.lean*.6);
+      // Preview the bend before the bike reaches it, keeping fast corner exits in frame.
+      const curveLook=THREE.MathUtils.clamp(sm.curvature*10,-2.6,2.6);
+      this.desired.addScaledVector(sm.right,curveLook*speed);
       this.desired.y+=3.0+speed*.35;
       if(air>.45){this.desired.addScaledVector(sm.right,Math.sin(air*.8)*2.5);this.desired.y+=air*.5;}
       this.target.lerp(ahead.position,.1);this.target.y+=player.airborne?.3:0;
