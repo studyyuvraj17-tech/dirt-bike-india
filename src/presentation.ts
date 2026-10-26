@@ -16,6 +16,7 @@ export class Presentation {
   private ready=false;
   private lastMode:CameraMode='title';
   private shake=0;
+  private cameraBank=0;
   private trail:TrailEffects;
   constructor(scene:THREE.Scene,camera:THREE.PerspectiveCamera,world:World,materialFactory:MaterialFactory){
     this.camera=camera;this.world=world;
@@ -45,7 +46,7 @@ export class Presentation {
       const mesh=new THREE.Mesh(geometry,material);mesh.position.copy(sm.position);shafts.add(mesh);
     }scene.add(shafts);
   }
-  reset(){this.ready=false;this.shake=0;this.trail.reset();}
+  reset(){this.ready=false;this.shake=0;this.cameraBank=0;this.trail.reset();}
   impact(force:number){this.shake=Math.min(.75,this.shake+force*.023);this.trail.impact(force);}
   update(player:RiderState,dt:number,time:number,mode:CameraMode,boost:boolean,brake=false,wetness=0,enhanced=true){
     const sm=this.world.sample(player.s),ahead=this.world.sample(Math.min(this.world.length,player.s+12+player.speed*.35));
@@ -90,6 +91,10 @@ export class Presentation {
     if(roughness>0){this.camera.position.y+=(Math.sin(time*43)+Math.sin(time*67)*.35)*roughness;this.camera.position.x+=Math.sin(time*31)*roughness*.55;}
     if(this.shake>.003&&enhanced){this.camera.position.x+=Math.sin(time*77)*this.shake;this.camera.position.y+=Math.sin(time*91)*this.shake*.6;}
     this.camera.up.copy(this.up);this.camera.lookAt(this.aim);
+    // A restrained horizon bank reinforces cornering without disorienting the rider.
+    const bankTarget=mode==='chase'&&enhanced?THREE.MathUtils.clamp(-player.lean*.045-sm.curvature*player.speed*.018,-.065,.065):0;
+    this.cameraBank=THREE.MathUtils.damp(this.cameraBank,bankTarget,4.5,dt);
+    this.camera.rotateZ(this.cameraBank);
     const fov=mode==='title'?56:mode==='wide'?56:mode==='replay'?56:59+speed*8+(boost?4:0);
     this.camera.fov=THREE.MathUtils.lerp(this.camera.fov,fov,1-Math.exp(-dt*4));this.camera.updateProjectionMatrix();this.lastMode=mode;
     this.trail.update(player,sm,this.camera,mode==='title'?0:dt,brake,wetness,enhanced);
