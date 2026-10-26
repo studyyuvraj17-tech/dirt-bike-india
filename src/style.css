@@ -244,3 +244,89 @@ h1 em{color:#e97f73}
 @media (prefers-reduced-motion:reduce){
   .sound-btn,.ride-btn,.garage-btn{transition:none}
 }
+
+
+/* Extra-cute candy alpine finish: soft sticker borders and cheerful HUD details. */
+:root{
+  --candy-berry:#df8298;
+  --candy-butter:#ffdc91;
+  --candy-sky:#b8dce8;
+  --candy-leaf:#a9d9b6;
+}
+.course-stats>div{
+  position:relative;
+  padding:9px 10px;
+  border-radius:14px;
+  background:#fff5dfb8;
+  box-shadow:0 3px 0 #315b4b12;
+}
+.course-stats>div:nth-child(2){background:#f8dce2c9}
+.course-stats>div:nth-child(3){background:#d9eee1d9}
+.course-stats b{color:#315b4b}
+.course-stats span{color:#54766b;letter-spacing:.8px}
+.daily-card{
+  border:2px solid #fff5df;
+  background:linear-gradient(135deg,#fff6e6ed,#f8dfe5e8);
+  box-shadow:0 5px 0 #315b4b12;
+}
+.daily-top>b{color:#d7798d}
+.daily-card>strong{color:#315b4b}
+.daily-card>small{color:#648176}
+.garage-btn{
+  border:2px solid #fff5df;
+  box-shadow:0 4px 0 #315b4b12;
+  color:#315b4b;
+}
+.effects-controls button{
+  border-radius:999px;
+  border:2px solid #fff5dfb8;
+  box-shadow:0 3px 0 #315b4b12;
+  background:#fff5dfdf;
+}
+.effects-controls button[aria-pressed="true"]{background:#d9eee1}
+.race-top>strong{
+  display:inline-block;
+  padding:5px 16px 8px;
+  border-radius:18px;
+  background:#fff5dfdf;
+  box-shadow:0 4px 0 #315b4b18;
+}
+.position>b{
+  color:#e98276;
+  text-shadow:2px 3px 0 #fff5df;
+}
+.corner>b{color:#e98276;text-shadow:0 3px 0 #fff5df80}
+.speed-panel{
+  padding:12px 15px;
+  border-radius:22px;
+  border:2px solid #fff5df85;
+  background:#254b488c;
+  backdrop-filter:blur(5px);
+}
+.progress-panel{border:2px solid #fff5df75}
+.leaderboard{border:2px solid #fff5df75}
+.modal{background:#254b48f5}
+.modal .eyebrow>span{background:var(--candy-berry)}
+.modal h2{color:#fff5df}
+.modal .text-btn{padding:10px 13px;background:#ffffff12}
+.result-row{border-color:#fff5df24}
+.touch-cluster button{
+  border:2px solid #fff5df;
+  border-radius:18px;
+  box-shadow:0 5px 0 #102b2780;
+}
+.touch-actions button{border-radius:14px}
+.player-label{
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  color:#fff5df!important;
+  font-size:19px!important;
+  text-shadow:0 2px 3px #254b48,0 0 6px #254b48!important;
+}
+@media(max-width:800px){
+  .course-stats>div{padding:8px 7px}
+  .speed-panel{border-radius:18px}
+}
