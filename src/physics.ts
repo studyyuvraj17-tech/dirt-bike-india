@@ -70,6 +70,9 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
     state.position.y = m.worldY;
   }
   if (state.finished || dt === 0) return events;
+  // Keep the movement segment so narrow obstacles cannot be skipped at race speed.
+  const stepStartS = state.s;
+  const stepStartLateral = state.lateral;
   m.cooldown = Math.max(0, m.cooldown - dt);
   if (m.comboTimer > 0) {
     m.comboTimer = Math.max(0, m.comboTimer - dt);
@@ -246,11 +249,28 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
     targetCompression += Math.sin(state.s * 2.1) * roughness * Math.min(1, state.speed / 16);
   }
   if(!state.airborne&&m.cooldown===0)for(const rock of world.obstacles||[]){
-    if(Math.abs(state.s-rock.s)<rock.radius+.4&&Math.abs(state.lateral-rock.lateral)<rock.radius+.3){
-      const hard=state.speed>28&&Math.abs(state.lateral-rock.lateral)<rock.radius*.6;
-      state.speed*=.73;state.compression=.85;m.suspensionVelocity=7;m.cooldown=.5;
-      m.lateralVelocity+=(state.lateral>rock.lateral?1:-1)*2;events.push({type:'land',force:13});
-      if(hard){state.crash=1.45;m.recoveryTime=0;m.crashDirection=steer||1;state.combo=0;state.comboMultiplier=1;m.comboTimer=0;events.push({type:'crash',force:19});}
+    // Test the closest point on this frame's swept path, not just the endpoint.
+    const segmentS = state.s - stepStartS;
+    if(rock.s < stepStartS - rock.radius - .45 || rock.s > state.s + rock.radius + .45) continue;
+    const along = segmentS > 1e-5 ? clamp((rock.s - stepStartS) / segmentS, 0, 1) : 0;
+    const lateralAtHit = THREE.MathUtils.lerp(stepStartLateral, state.lateral, along);
+    const lateralDistance = Math.abs(lateralAtHit - rock.lateral);
+    const hitWidth = rock.radius + .48;
+    if(lateralDistance < hitWidth){
+      const overlap = 1 - lateralDistance / hitWidth;
+      const hard = state.speed > 26 && overlap > .58;
+      // Glancing scrapes cost less speed; square hits compress the fork and can crash.
+      state.speed *= 1 - (.12 + overlap * .28);
+      state.compression = Math.min(1, .58 + overlap * .34);
+      m.suspensionVelocity = 4.5 + overlap * 5.5;
+      m.cooldown = .5;
+      m.lateralVelocity += (lateralAtHit >= rock.lateral ? 1 : -1) * (1.1 + overlap * 1.7);
+      events.push({type:'land',force:8 + overlap * 13});
+      if(hard){
+        state.crash=1.45;m.recoveryTime=0;m.crashDirection=steer||1;
+        state.combo=0;state.comboMultiplier=1;m.comboTimer=0;
+        events.push({type:'crash',force:12 + overlap * 10});
+      }
       break;
     }
   }
