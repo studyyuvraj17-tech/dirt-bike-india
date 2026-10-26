@@ -18,6 +18,7 @@ interface Dynamics {
   suspensionVelocity: number;
   recoveryTime: number;
   crashDirection: number;
+  comboTimer: number;
 }
 
 const dynamics = new WeakMap<RiderState, Dynamics>();
@@ -36,7 +37,7 @@ function memory(state: RiderState): Dynamics {
     value = { initialized: false, lastS: state.s, worldY: 0, lateralVelocity: 0,
       preload: 0, wasCrouching: false, previousTrickInput: 0, cooldown: 0,
       trickId: 0, trickTime: 0, pendingScore: 0, suspensionVelocity: 0,
-      recoveryTime: 0, crashDirection: 1 };
+      recoveryTime: 0, crashDirection: 1, comboTimer: 0 };
     dynamics.set(state, value);
   }
   return value;
@@ -45,7 +46,7 @@ function memory(state: RiderState): Dynamics {
 export function resetPhysics(state:RiderState):void { dynamics.delete(state); }
 
 export function createRiderState(id: number, name: string, color: number): RiderState {
-  return { id, name, color, s: 0, lateral: 0, speed: 0, y: 0, vy: 0,
+  return { id, name, color, bikeClass: 'balanced', combo: 0, comboMultiplier: 1, s: 0, lateral: 0, speed: 0, y: 0, vy: 0,
     airborne: false, airTime: 0, pitch: 0, roll: 0, yaw: 0, lean: 0,
     compression: 0, cadence: 0, crash: 0, boost: .35, score: 0,
     trick: '', trickRotation: 0, finished: false, finishTime: 0,
@@ -70,6 +71,10 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
   }
   if (state.finished || dt === 0) return events;
   m.cooldown = Math.max(0, m.cooldown - dt);
+  if (m.comboTimer > 0) {
+    m.comboTimer = Math.max(0, m.comboTimer - dt);
+    if (m.comboTimer === 0) { state.combo = 0; state.comboMultiplier = 1; }
+  }
 
   if (state.crash > 0) {
     state.crash = Math.max(0, state.crash - dt);
@@ -102,18 +107,18 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
 
   // Gravity, rolling losses and aerodynamic drag share units of m/s².
   const downhill = clamp(-before.slope, -.8, .95);
-  const push = input.pedal ? 6.1 : .9;
+  const push = (input.pedal ? 6.1 : .9) + (state.bikeClass === 'sprinter' && input.pedal ? .9 : 0);
   const rolling = rollingResistance[before.surface];
   let acceleration = downhill * 17 + push + (boosting ? 11 : 0)
     - rolling - state.speed * state.speed * .005;
   if (input.brake) acceleration -= 17 + state.speed * .19;
   if (Math.abs(state.lateral) > before.width * .48) acceleration -= 4.2;
   if (state.airborne) acceleration = (boosting ? 2 : 0) - state.speed * .018;
-  state.speed = clamp(state.speed + acceleration * dt, 0, boosting ? 43 : 35);
+  state.speed = clamp(state.speed + acceleration * dt, 0, (boosting ? 43 : 35) + (state.bikeClass === 'sprinter' ? 3 : 0));
 
   const steer = clamp(input.steer, -1, 1);
   const slide = input.brake && state.speed > 12 ? .68 : 1;
-  const steeringTarget = steer * (2.3 + state.speed * .115);
+  const steeringTarget = steer * (2.3 + state.speed * .115) * (state.bikeClass === 'freeride' ? 1.12 : 1);
   m.lateralVelocity = damp(m.lateralVelocity, steeringTarget,
     (state.airborne ? 2 : 7 * surfaceGrip * slide), dt);
   // A little centrifugal drift gives berms and brake slides readable consequences.
@@ -196,13 +201,17 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
       if (badRotation || impact > 39) {
         state.crash = 1.45; m.recoveryTime = 0;
         m.crashDirection = steer || (state.id % 2 ? -1 : 1);
-        m.pendingScore = 0; state.trick = 'WIPEOUT';
+        m.pendingScore = 0; state.trick = 'WIPEOUT'; state.combo = 0; state.comboMultiplier = 1; m.comboTimer = 0;
         events.push({ type: 'crash', force: impact });
       } else {
         const clean = angleError < .5;
         state.speed *= clean ? .995 : .86;
         if (m.pendingScore > 0) {
-          const points = Math.round(m.pendingScore * (clean ? 1.25 : 1));
+          if (m.comboTimer > 0) state.combo += 1; else state.combo = 1;
+          state.comboMultiplier = Math.min(3, 1 + (state.combo - 1) * .5);
+          m.comboTimer = 5.5;
+          const bikeBonus = state.bikeClass === 'freeride' ? 1.12 : 1;
+          const points = Math.round(m.pendingScore * (clean ? 1.25 : 1) * state.comboMultiplier * bikeBonus);
           state.score += points;
           state.boost = Math.min(1, state.boost + points / 1500);
           events.push({ type: 'trick', force: impact, score: points, name: state.trick });
