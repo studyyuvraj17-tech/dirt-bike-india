@@ -1,7 +1,5 @@
 import type { InputState } from './types';
 
-type VirtualKey = 'KeyW' | 'KeyA' | 'KeyD' | 'KeyS' | 'Space' | 'ShiftLeft';
-
 export class Controls {
   keys = new Set<string>();
   enabled = true;
