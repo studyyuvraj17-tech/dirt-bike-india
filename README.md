@@ -132,13 +132,10 @@ Practical implementation limits:
 The nine system milestones are integrated into one runnable build. Separate historical milestone builds were not archived.
 
 
-## Gameplay polish update
+## Recent gameplay polish
 
-The `improvements/ride-feel-and-gameplay` branch includes a focused handling pass:
-- Distinct rolling resistance for rock, dirt, grass and scree, with traction tuned per surface.
-- Slightly stronger pedal response and more responsive boost recharge between bursts.
-- More controlled high-speed steering and a clearer brake-slide balance.
-- A small jump-launch/gravity rebalance to make preload and jump timing feel more deliberate.
-- HUD interaction polish, restrained entrance/hover feedback, and reduced-motion support.
+The merged handling pass tunes traction and rolling resistance separately for rock, dirt, grass and scree, improves pedal response and boost recovery, and makes high-speed steering and preload jumps more deliberate. The HUD also has restrained action feedback and reduced-motion support.
 
-These are tuning changes rather than a new physics engine. Please run `npm run build` and `npm test` locally before merging; this environment has not executed the browser suite.
+Track sampling now gives the outer shoulders a grass surface, so drifting wide costs grip and speed rather than behaving like the packed dirt racing line. The Razor Ridge is loose scree, while the Rock Garden and Divide use hard-rock handling. This makes line choice matter without changing the race route or controls.
+
+Validation for this latest update: `npm run build` and `npm test` have not been executed in this GitHub editing session.
