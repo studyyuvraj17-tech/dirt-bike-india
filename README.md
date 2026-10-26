@@ -1,4 +1,4 @@
-# SUNBREAK — Downhill Club
+# Dirt Bike India 
 
 <p align="center">
   <img src="media/SUNBREAK-showcase-poster.jpg" alt="Four cel-shaded BMX riders racing down the SUNBREAK mountain course" width="100%">
