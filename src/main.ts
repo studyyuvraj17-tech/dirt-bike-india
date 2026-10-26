@@ -22,13 +22,13 @@ let enhancedEffects=true,rainWeather=false,lensWetness=0;
 try{enhancedEffects=localStorage.getItem('sunbreak.effects')!=='reduced';}catch{/* Private browsing can deny storage. */}
 let debugInput:Partial<InputState>={};
 const replayFrames:RiderState[]=[];let biggestFrames:RiderState[]=[];let airFrames:RiderState[]=[];let tailRecord=0;
-const renderer=new THREE.WebGLRenderer({antialias:false,alpha:false,powerPreference:'high-performance'});
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
 renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.NoToneMapping;
 renderer.info.autoReset=false;
 document.querySelector('#app')!.appendChild(renderer.domElement);
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(61,innerWidth/innerHeight,.08,10000);
-let pixelRatio=Math.min(devicePixelRatio,2),fps=60,perfClock=0,perfFrames=0,slowFrames=0;
+let pixelRatio=Math.min(devicePixelRatio,2.25),fps=60,perfClock=0,perfFrames=0,slowFrames=0;
 const perf={fps:60,drawCalls:0,triangles:0,pixelRatio};
 const controls=new Controls(action);
 
@@ -144,6 +144,6 @@ function frame(now:number){
   requestAnimationFrame(frame);
   const actualDt=lastTime?(now-lastTime)/1000:1/60;const dt=Math.min(actualDt,.1);lastTime=now;
   if(!api.paused)advance(dt);
-  if(!capture){perfClock+=actualDt;perfFrames++;if(perfClock>=2){fps=perfFrames/perfClock;perf.fps=Math.round(fps);slowFrames=fps<54?slowFrames+1:Math.max(0,slowFrames-1);if(slowFrames>=2&&pixelRatio>1&&!race.player.airborne&&race.player.crash===0){pixelRatio=Math.max(1,pixelRatio-.15);resize();slowFrames=0;}else if(fps>59.5&&pixelRatio<Math.min(devicePixelRatio,2)){pixelRatio=Math.min(devicePixelRatio,2,pixelRatio+.05);resize();}perfClock=0;perfFrames=0;}}
+  if(!capture){perfClock+=actualDt;perfFrames++;if(perfClock>=2){fps=perfFrames/perfClock;perf.fps=Math.round(fps);slowFrames=fps<54?slowFrames+1:Math.max(0,slowFrames-1);if(slowFrames>=2&&pixelRatio>1&&!race.player.airborne&&race.player.crash===0){pixelRatio=Math.max(1.25,pixelRatio-.1);resize();slowFrames=0;}else if(fps>59.5&&pixelRatio<Math.min(devicePixelRatio,2.25)){pixelRatio=Math.min(devicePixelRatio,2.25,pixelRatio+.05);resize();}perfClock=0;perfFrames=0;}}
 }
 requestAnimationFrame(frame);
