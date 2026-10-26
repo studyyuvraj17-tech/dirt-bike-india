@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 
-// GitHub Pages serves this project from /indian-bike-3d/.
+// Serve from the domain root on Cloudflare Workers/Pages.
 export default defineConfig({
-  base: '/indian-bike-3d/',
+  base: '/',
+  plugins: [],
 });
