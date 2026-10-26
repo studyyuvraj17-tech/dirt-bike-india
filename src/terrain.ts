@@ -230,6 +230,31 @@ export function createWorld(materialFactory: MaterialFactory): World {
     for(let i=0;i<30;i++){const s=length*(chunk+random())/12,side=random()>.5?1:-1,p=sample(s,side*(6+random()*40)).position;p.y=height(p.x,p.z);const size=.6+random()*2.5;rocks.push({position:p,scale:new THREE.Vector3(size*1.4,size*.7,size),angle:random()*6.28});}
     instances(trunkGeo,trunkMat,trunks,650);instances(canopyGeo,leafMat,leaves,650);addOutline(instances(canopyGeo,leafLight,upper,650),.65);addOutline(instances(rockGeo,rockMat,rocks,430),.8);
   }
+  // Landmark rock towers make the descent feel like a sequence of distinct places,
+  // not a repeating forest. They sit well beyond the rideable shoulders.
+  const spireGeo=new THREE.ConeGeometry(1,1,5);spireGeo.translate(0,.5,0);
+  const spireMat=materialFactory(0x747f80,'rock'),spireLight=materialFactory(0x9a9c8c,'rock');
+  const spires:Array<{position:THREE.Vector3;scale:THREE.Vector3;angle:number}>=[],spireFaces:typeof spires=[];
+  for(let i=0;i<42;i++){
+    const s=length*(.04+random()*.91),side=random()>.5?1:-1;
+    const lateral=side*(18+random()*58),p=sample(s,lateral).position;
+    p.y=height(p.x,p.z)-.8;
+    const h=9+random()*31,w=2.8+random()*8,angle=random()*Math.PI*2;
+    spires.push({position:p.clone(),scale:new THREE.Vector3(w,h,w),angle});
+    if(i%3===0)spireFaces.push({position:p.clone().add(new THREE.Vector3(side*w*.65,h*.22,0)),scale:new THREE.Vector3(w*.55,h*.56,w*.72),angle:angle+.4});
+  }
+  addOutline(instances(spireGeo,spireMat,spires,520),.75);
+  instances(rockGeo,spireLight,spireFaces,470);
+  // Small pine-like saplings and alpine boulders enrich the near track edges.
+  const saplingGeo=new THREE.ConeGeometry(1,1,6);saplingGeo.translate(0,.5,0);
+  const saplingMat=materialFactory(0x3f6b59,'foliage'),saplings:Array<{position:THREE.Vector3;scale:THREE.Vector3;angle:number}>=[];
+  for(let i=0;i<210;i++){
+    const s=length*(random()>.5?random():.58+random()*.42),side=random()>.5?1:-1;
+    const p=sample(s,side*(7+random()*10)).position;p.y=height(p.x,p.z);
+    const h=1.8+random()*4.2,w=.65+random()*1.4;
+    saplings.push({position:p.clone(),scale:new THREE.Vector3(w,h,w),angle:random()*Math.PI*2});
+  }
+  instances(saplingGeo,saplingMat,saplings,180);
   const obstacles=Array.from({length:11},(_,i)=>({s:length*(.349+i*.0055),lateral:Math.sin(i*2.4)*2.6,radius:.38+(i%3)*.12}));
   const obstacleItems=obstacles.map(o=>{const p=sample(o.s,o.lateral).position;p.y+=.15;return {position:p,scale:new THREE.Vector3(o.radius*1.1,o.radius*.7,o.radius),angle:o.s};});
   addOutline(instances(rockGeo,rockMat,obstacleItems,350),.85);
