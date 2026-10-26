@@ -93,7 +93,9 @@ function render(dt:number,draw=true){
     shadowTransform.position.copy(sm.position);shadowTransform.position.y+=.125;shadowTransform.rotation.set(Math.atan(sm.slope),Math.atan2(-sm.tangent.x,-sm.tangent.z),0,'YXZ');
     shadowTransform.scale.set(.45,1,1.05);if(replay&&i!==0||s.y>8)shadowTransform.scale.setScalar(0);shadowTransform.updateMatrix();shadows.setMatrixAt(i,shadowTransform.matrix);
   }shadows.instanceMatrix.needsUpdate=true;
-  ghostVisual.group.visible=race.ghost.length>1&&race.phase==='racing'&&!replay;
+  // Keep the personal-best wireframe ghost disabled by default: it overlaps the live rider
+  // on close runs and reads as a cyan mesh duplicate. The saved ghost data remains intact.
+  ghostVisual.group.visible=false;
   if(ghostVisual.group.visible){if(race.elapsed<race.ghost[ghostIndex]?.time)ghostIndex=0;while(ghostIndex<race.ghost.length-2&&race.ghost[ghostIndex+1].time<race.elapsed)ghostIndex++;const a=race.ghost[ghostIndex],b=race.ghost[ghostIndex+1];const t=THREE.MathUtils.clamp((race.elapsed-a.time)/Math.max(.001,b.time-a.time),0,1);ghostState.s=THREE.MathUtils.lerp(a.s,b.s,t);ghostState.lateral=THREE.MathUtils.lerp(a.lateral,b.lateral,t);const sm=world.sample(ghostState.s,ghostState.lateral);ghostState.position.copy(sm.position);ghostState.yaw=Math.atan2(-sm.tangent.x,-sm.tangent.z);ghostState.pitch=Math.atan(sm.slope);ghostState.speed=24;ghostVisual.update(ghostState,sm,dt,simTime);}
   const mode=replay?'replay':race.phase==='title'?'title':cameraMode;
   const input=showcase?showcase.input():{...controls.read(),...debugInput};
