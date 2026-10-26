@@ -255,7 +255,15 @@ export function createWorld(materialFactory: MaterialFactory): World {
     saplings.push({position:p.clone(),scale:new THREE.Vector3(w,h,w),angle:random()*Math.PI*2});
   }
   instances(saplingGeo,saplingMat,saplings,180);
-  const obstacles=Array.from({length:11},(_,i)=>({s:length*(.349+i*.0055),lateral:Math.sin(i*2.4)*2.6,radius:.38+(i%3)*.12}));
+  // Readable obstacle clusters are spread across the descent, with gaps for line choice.
+  // Keep them inside the rideable corridor and vary the lane and size deterministically.
+  const obstaclePlan=[
+    [.19,-2.1,.48],[.205,1.8,.58],[.31,.4,.42],
+    [.365,-2.7,.52],[.382,2.5,.46],[.47,1.6,.62],
+    [.565,-1.5,.44],[.58,2.8,.54],[.675,.2,.46],
+    [.765,-2.4,.6],[.79,2.1,.48],[.865,-.5,.55],
+  ] as const;
+  const obstacles=obstaclePlan.map(([progress,lateral,radius])=>({s:length*progress,lateral,radius}));
   const obstacleItems=obstacles.map(o=>{const p=sample(o.s,o.lateral).position;p.y+=.15;return {position:p,scale:new THREE.Vector3(o.radius*1.1,o.radius*.7,o.radius),angle:o.s};});
   addOutline(instances(rockGeo,rockMat,obstacleItems,350),.85);
   // Grassy cut banks and clustered flowers. Blade triangles are geometry,
