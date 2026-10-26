@@ -152,3 +152,95 @@
   .course-stats { gap: clamp(12px, 4vw, 22px); }
   .daily-card, .garage-btn, .title-panel > .ride-btn { width: min(100%, 335px); }
 }
+
+
+/* Cozy alpine sticker-book polish: softer cards, candy accents, and friendly shapes. */
+:root{
+  --cute-ink:#254b48;
+  --cute-mint:#d8eee0;
+  --cute-peach:#ffb28f;
+  --cute-pink:#f5a8b9;
+  --cute-cream:#fff5df;
+}
+.wordmark{letter-spacing:-1.2px;text-shadow:1px 2px 0 #fff6df80}
+.wordmark span{color:#52766b}
+.edition i{color:#ee8c9e}
+.sound-btn{
+  border-radius:999px;
+  border-color:#315b4b35;
+  background:#fff4dfb8;
+  box-shadow:0 4px 0 #315b4b16;
+  transition:transform .18s ease,background .18s ease;
+}
+.sound-btn:hover{transform:translateY(-2px);background:#fff7e8}
+.title-panel{width:min(490px,88vw)}
+.eyebrow{color:#53736a}
+.eyebrow>span{width:9px;height:9px;border-radius:50%;background:var(--cute-pink);box-shadow:0 0 0 4px #f5a8b927}
+h1{letter-spacing:-5px;text-shadow:0 3px 0 #fff4df45}
+h1 em{color:#e97f73}
+.course-card{
+  border-top:0;
+  border-radius:18px;
+  background:#fff5dfb8;
+  box-shadow:0 5px 0 #315b4b10;
+  padding:15px 16px;
+  width:min(335px,100%);
+}
+.course-number{color:#e98276}
+.course-arrow{color:#e98276}
+.ride-btn{
+  border-radius:16px;
+  background:#ffad91;
+  color:#254b48;
+  box-shadow:0 5px 0 #b96e60;
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.ride-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 7px 0 #b96e60;
+  background:#ffc0a7;
+}
+.ride-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #b96e60}
+.garage-btn,.text-btn{
+  border-radius:999px;
+}
+.garage-btn{
+  border-color:#315b4b3d;
+  background:#fff5dfb8;
+  transition:background .18s ease,transform .18s ease;
+}
+.garage-btn:hover{background:#f8d8e0;transform:translateY(-1px)}
+.title-bottom{letter-spacing:1.5px}
+.tiny-square{border-radius:50%;background:#f29aab;box-shadow:0 0 0 4px #f29aab2a}
+.seal{border-radius:50%;border-color:#e9a0ae;color:#d87d8d;background:#fff5df90}
+.leaderboard,.progress-panel{
+  border-radius:18px;
+  clip-path:none;
+  box-shadow:0 8px 24px #173d3620;
+  border:1px solid #fff5df30;
+}
+.leaderboard{background:#254b48df}
+.progress-panel{background:#254b48bd;border-radius:18px}
+.boost-track{border-radius:999px;overflow:hidden;transform:none}
+.boost-track i{background:linear-gradient(90deg,#a8dfb5,#ffd17d,#ff9f9f);border-radius:999px}
+.score-panel b{color:#fff2c9;text-shadow:0 3px 0 #254b4860}
+.countdown,.trick-popup{filter:drop-shadow(0 4px 0 #254b4825)}
+.modal{
+  border-radius:28px;
+  border:2px solid #fff1d4;
+  box-shadow:0 18px 60px #173d3640;
+}
+.modal .ride-btn{border-radius:16px}
+.daily-card,.garage-option,.result-stats>div{
+  border-radius:16px;
+}
+.player-label{
+  border-radius:999px;
+  padding:7px 11px;
+  background:#fff4dfdf;
+  color:#254b48;
+  box-shadow:0 3px 0 #254b4828;
+}
+@media (prefers-reduced-motion:reduce){
+  .sound-btn,.ride-btn,.garage-btn{transition:none}
+}
