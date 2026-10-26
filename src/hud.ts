@@ -30,6 +30,7 @@ export class HUD {
   setMuted(muted:boolean){this.el('sound-state').textContent=muted?'OFF':'ON';}
   update(s:HudState,dt:number){
     const title=s.phase==='title', result=s.phase==='results';
+    document.getElementById('touch-controls')?.classList.toggle('hidden', title || result || s.phase === 'paused');
     this.el('title-panel').classList.toggle('hidden',!title);this.el('title-bottom').classList.toggle('hidden',!title);this.el('race-hud').classList.toggle('hidden',title||result&&!s.replay);this.el('pause-panel').classList.toggle('hidden',s.phase!=='paused');this.el('results-panel').classList.toggle('hidden',!result||s.replay);this.el('replay-label').classList.toggle('hidden',!s.replay);
     const order=[...s.riders].sort((a,b)=>b.s-a.s);const p=s.player;
     this.el('course-length').textContent=(s.world.length/1000).toFixed(1);this.el('course-drop').textContent=String(Math.round(s.world.sample(0).position.y-s.world.sample(s.world.length).position.y));
