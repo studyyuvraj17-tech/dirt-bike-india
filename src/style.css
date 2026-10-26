@@ -4,3 +4,32 @@
 @media(min-width:1000px) and (min-height:751px){.title-panel{width:700px;top:25%}h1{font-size:88px;letter-spacing:-5px}.title-panel>p{margin:24px 0 28px}}
 
 .effects-controls{position:absolute;right:45px;top:83px;display:flex;gap:8px;pointer-events:auto}.effects-controls button{border:1px solid #33594d55;background:#e4e8cfbb;color:#214b43;font:700 8px Arial,sans-serif;letter-spacing:1px;padding:8px 9px}.effects-controls b{margin-left:5px}.effects-controls kbd{font:inherit;margin-left:9px;opacity:.55}.effects-controls button:hover{background:#f3dbac}.effects-controls button:focus-visible{outline:2px solid #e97843;outline-offset:3px}@media(max-width:800px){.effects-controls{top:68px;right:20px}.effects-controls button{font-size:7px;padding:6px}.effects-controls kbd{margin-left:4px}}
+
+
+/* Touch-first riding controls; hidden on desktop and outside active riding. */
+.touch-controls{display:none;position:fixed;z-index:5;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom));padding:0 16px;align-items:flex-end;justify-content:space-between;gap:14px;pointer-events:none;user-select:none;-webkit-user-select:none;touch-action:none}
+.touch-cluster{display:flex;align-items:flex-end;gap:9px;pointer-events:auto}
+.touch-cluster button{display:flex;align-items:center;justify-content:center;border:1px solid #fff0c76b;background:#173d37c9;color:#fff2d2;box-shadow:0 4px 0 #102b27a8;font:900 11px Arial,sans-serif;letter-spacing:1px;touch-action:none;-webkit-user-select:none;user-select:none;backdrop-filter:blur(5px)}
+.touch-steering button{width:clamp(48px,10vw,66px);height:clamp(54px,11vw,72px);font-size:23px}
+.touch-actions{display:grid;grid-template-columns:repeat(2,minmax(62px,78px));grid-template-rows:repeat(2,43px);gap:8px}
+.touch-actions button{min-width:62px;min-height:43px;padding:0 8px;font-size:9px}
+.touch-cluster button.is-held{background:#e97843;color:#173b36;transform:translateY(3px);box-shadow:0 1px 0 #102b27a8}
+.touch-cluster button:focus-visible{outline:2px solid #fff2d2;outline-offset:3px}
+@media(max-width:800px),(pointer:coarse){
+  .touch-controls:not(.hidden){display:flex}
+  .race-controls{bottom:154px;max-width:90%;line-height:1.8}
+  .progress-panel{bottom:150px}
+  .speed-panel{bottom:150px}
+  .score-panel{bottom:158px}
+}
+@media(max-width:420px){
+  .touch-controls{padding-left:10px;padding-right:10px;gap:6px}
+  .touch-cluster{gap:6px}
+  .touch-steering button{width:47px;height:56px}
+  .touch-actions{grid-template-columns:repeat(2,60px);grid-template-rows:repeat(2,39px);gap:6px}
+  .touch-actions button{min-width:60px;min-height:39px;font-size:8px}
+  .race-controls{bottom:143px}
+  .progress-panel{bottom:142px;width:160px}
+  .speed-panel{bottom:142px;width:125px}
+  .speed-panel b{font-size:58px}
+}
