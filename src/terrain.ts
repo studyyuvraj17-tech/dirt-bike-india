@@ -265,7 +265,61 @@ export function createWorld(materialFactory: MaterialFactory): World {
   ] as const;
   const obstacles=obstaclePlan.map(([progress,lateral,radius])=>({s:length*progress,lateral,radius}));
   const obstacleItems=obstacles.map(o=>{const p=sample(o.s,o.lateral).position;p.y+=.15;return {position:p,scale:new THREE.Vector3(o.radius*1.1,o.radius*.7,o.radius),angle:o.s};});
+
   addOutline(instances(rockGeo,rockMat,obstacleItems,350),.85);
+
+  // Indian road cows: a few friendly, chunky cows occasionally wander into the riding line.
+  // Their positions are deterministic so they feel authored rather than randomly teleporting.
+  const cowPlans=[
+    {progress:.255,lateral:-.7,heading:.55},
+    {progress:.505,lateral:1.15,heading:-.35},
+    {progress:.715,lateral:-1.35,heading:.8},
+    {progress:.925,lateral:.35,heading:-.65},
+  ];
+  const cowBodyMat=materialFactory(0xf4ead2,'cloth');
+  const cowPatchMat=materialFactory(0x4b4a43,'cloth');
+  const cowMuzzleMat=materialFactory(0xd99b91,'skin');
+  const cowHornMat=materialFactory(0xe5d9b8,'metal');
+  const cowEyeMat=materialFactory(0x253c3a,'metal');
+  const cowLegMat=materialFactory(0x554d43,'cloth');
+  const cowGeo=new THREE.SphereGeometry(1,18,14);
+  const cowLegGeo=new THREE.CylinderGeometry(.105,.13,.58,8);
+  const cowEarGeo=new THREE.SphereGeometry(1,10,8);
+  const cows=cowPlans.map((plan,index)=>{
+    const s=length*plan.progress,lateral=plan.lateral;
+    const sm=sample(s,lateral);
+    const cow=new THREE.Group();cow.name='Roadside Indian cow';cow.position.copy(sm.position);cow.position.y+=.03;
+    cow.rotation.y=Math.atan2(-sm.tangent.x,-sm.tangent.z)+plan.heading;
+    const part=(geo:THREE.BufferGeometry,mat:THREE.Material,pos:THREE.Vector3,scale:THREE.Vector3)=>{
+      const mesh=new THREE.Mesh(geo,mat);mesh.position.copy(pos);mesh.scale.copy(scale);cow.add(mesh);return mesh;
+    };
+    // Body runs along local Z, with a gently raised shoulder hump.
+    part(cowGeo,cowBodyMat,new THREE.Vector3(0,.77,0),new THREE.Vector3(.48,.57,.88));
+    part(cowGeo,cowBodyMat,new THREE.Vector3(0,1.04,-.38),new THREE.Vector3(.43,.48,.48));
+    part(cowGeo,cowBodyMat,new THREE.Vector3(0,.96,.78),new THREE.Vector3(.32,.37,.34));
+    // Distinct dark coat patches make the silhouette readable from the chase camera.
+    part(cowGeo,cowPatchMat,new THREE.Vector3(-.405,.91,-.12),new THREE.Vector3(.09,.31,.28));
+    part(cowGeo,cowPatchMat,new THREE.Vector3(.405,.89,.23),new THREE.Vector3(.08,.26,.25));
+    part(cowGeo,cowPatchMat,new THREE.Vector3(-.18,1.18,-.47),new THREE.Vector3(.13,.13,.17));
+    part(cowGeo,cowPatchMat,new THREE.Vector3(.18,1.19,-.35),new THREE.Vector3(.12,.12,.15));
+    // Head, muzzle, ears, little horns and eyes.
+    part(cowGeo,cowBodyMat,new THREE.Vector3(0,1.03,1.02),new THREE.Vector3(.31,.34,.39));
+    part(cowGeo,cowMuzzleMat,new THREE.Vector3(0,.88,1.35),new THREE.Vector3(.22,.16,.17));
+    for(const side of [-1,1]){
+      part(cowEarGeo,cowBodyMat,new THREE.Vector3(side*.34,1.19,.96),new THREE.Vector3(.19,.09,.11));
+      part(cowGeo,cowHornMat,new THREE.Vector3(side*.19,1.36,.91),new THREE.Vector3(.065,.17,.065));
+      part(cowGeo,cowEyeMat,new THREE.Vector3(side*.22,1.1,1.31),new THREE.Vector3(.045,.055,.035));
+      const leg=new THREE.Mesh(cowLegGeo,cowLegMat);leg.position.set(side*.29,.29,index%2===0?-.48:.48);cow.add(leg);
+      const leg2=new THREE.Mesh(cowLegGeo,cowLegMat);leg2.position.set(side*.29,.29,index%2===0?.48:-.48);cow.add(leg2);
+      part(cowGeo,cowBodyMat,new THREE.Vector3(side*.29,.55,index%2===0?-.48:.48),new THREE.Vector3(.12,.15,.13));
+    }
+    const tail=new THREE.Mesh(new THREE.CylinderGeometry(.025,.045,.48,6),cowLegMat);
+    tail.position.set(0,.78,-.91);tail.rotation.x=-.55;cow.add(tail);
+    group.add(cow);
+    return {s,lateral,radius:1.0};
+  });
+  obstacles.push(...cows);
+
   // Grassy cut banks and clustered flowers. Blade triangles are geometry,
   // so every detail remains graphic and works without downloaded sprites.
   const grassGeo=new THREE.BufferGeometry();grassGeo.setAttribute('position',new THREE.Float32BufferAttribute([-.3,0,0,0,1,0,.15,0,0,0,0,-.3,0,.8,.05,0,0,.3],3));grassGeo.computeVertexNormals();
