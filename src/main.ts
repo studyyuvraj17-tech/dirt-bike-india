@@ -58,7 +58,7 @@ const ghostState=snapshot(race.player);
 const shadowGeo=new THREE.CircleGeometry(1,20);shadowGeo.rotateX(-Math.PI/2);
 const shadows=new THREE.InstancedMesh(shadowGeo,createMaterial(0x53654b,'shadow'),4);
 shadows.frustumCulled=false;scene.add(shadows);const shadowTransform=new THREE.Object3D();
-const playerLabel=document.createElement('div');playerLabel.className='player-label';playerLabel.innerHTML='YOU <span>▼</span>';document.body.append(playerLabel);const labelPosition=new THREE.Vector3();
+const playerLabel=document.createElement('div');playerLabel.className='player-label';playerLabel.innerHTML='▼';document.body.append(playerLabel);const labelPosition=new THREE.Vector3();
 presentation=new Presentation(scene,camera,world,createMaterial);
 pipeline=new NPRPipeline(renderer,scene,camera);resize();hud.setEffects(enhancedEffects,rainWeather);
 let ghostIndex=0;
