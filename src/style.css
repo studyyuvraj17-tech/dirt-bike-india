@@ -330,3 +330,36 @@ h1 em{color:#e97f73}
   .course-stats>div{padding:8px 7px}
   .speed-panel{border-radius:18px}
 }
+
+
+/* Gameplay readability and small-screen comfort pass. */
+#hud{isolation:isolate}
+.frame-top,.title-panel,.leaderboard,.progress-panel,.speed-panel,.modal{backface-visibility:hidden}
+button,.sound-btn,.garage-btn,.ride-btn{touch-action:manipulation}
+button:disabled{opacity:.55;cursor:default}
+@media(max-width:800px){
+  .frame-top{top:max(14px,env(safe-area-inset-top));left:14px;right:14px;gap:10px}
+  .wordmark{font-size:22px}
+  .wordmark span{font-size:7px;letter-spacing:2.5px;margin-top:7px}
+  .edition{top:2px;font-size:8px;letter-spacing:1.2px}
+  .edition span{font-size:7px;letter-spacing:.8px;margin-top:5px}
+  .sound-btn{padding:9px 11px;min-height:38px}
+  .title-panel{max-width:calc(100vw - 28px)}
+  .title-panel h1{max-width:100%;overflow-wrap:anywhere}
+  .course-card,.daily-card,.garage-btn,.title-panel>.ride-btn{max-width:100%}
+  .course-stats{display:flex;flex-wrap:wrap}
+  .course-stats>div{min-width:0;flex:1}
+  .leaderboard{right:12px;top:68px;max-width:min(190px,48vw);padding:10px}
+  .progress-panel{left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom))}
+  .speed-panel{bottom:100px;max-width:44vw}
+  .touch-cluster{bottom:max(18px,env(safe-area-inset-bottom));}
+  .touch-cluster button{min-width:48px;min-height:48px}
+  .touch-actions button{min-height:42px}
+  .modal{width:calc(100vw - 28px);max-height:calc(100dvh - 28px);overflow:auto}
+}
+@media(min-width:801px){
+  .leaderboard,.progress-panel,.speed-panel{backdrop-filter:blur(7px)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
