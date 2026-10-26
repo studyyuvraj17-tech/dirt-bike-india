@@ -33,3 +33,45 @@
   .speed-panel{bottom:142px;width:125px}
   .speed-panel b{font-size:58px}
 }
+
+
+/* Ride-feel polish: clearer action feedback and restrained cinematic HUD motion. */
+@keyframes hud-rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.title-panel, .frame-top, .title-bottom { animation: hud-rise-in .55s cubic-bezier(.2,.75,.25,1) both; }
+.title-panel { animation-delay: .06s; }
+.title-bottom { animation-delay: .12s; }
+.ride-btn { position: relative; overflow: hidden; }
+.ride-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -55%;
+  width: 35%;
+  transform: skewX(-22deg);
+  background: linear-gradient(90deg, transparent, #fff7d855, transparent);
+  transition: left .45s ease;
+  pointer-events: none;
+}
+.ride-btn:hover::after { left: 125%; }
+.leaderboard, .progress-panel, .modal {
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+}
+.leaderboard { border-left: 2px solid #e97843; }
+.progress-panel { border-top: 2px solid #f1b86d; }
+.speed-panel { filter: drop-shadow(0 4px 12px #153d3640); }
+.speed-panel .boost-track { overflow: hidden; }
+.boost-track i { box-shadow: 0 0 12px #f5b75588; }
+.trick-popup { animation: hud-rise-in .18s ease-out both; }
+.modal { border-top: 3px solid #e97843; }
+.effects-controls button, .sound-btn { transition: background .16s ease, transform .16s ease, border-color .16s ease; }
+.effects-controls button:active, .sound-btn:active { transform: translateY(2px); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+@media (max-width: 800px) {
+  .leaderboard, .progress-panel { backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+  .ride-btn { min-height: 56px; }
+}

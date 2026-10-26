@@ -130,3 +130,15 @@ Practical implementation limits:
 - Best-run ghost samples record track progress and lateral line; they do not reproduce the complete airborne pose. The cinematic replay does record full rider state.
 
 The nine system milestones are integrated into one runnable build. Separate historical milestone builds were not archived.
+
+
+## Gameplay polish update
+
+The `improvements/ride-feel-and-gameplay` branch includes a focused handling pass:
+- Distinct rolling resistance for rock, dirt, grass and scree, with traction tuned per surface.
+- Slightly stronger pedal response and more responsive boost recharge between bursts.
+- More controlled high-speed steering and a clearer brake-slide balance.
+- A small jump-launch/gravity rebalance to make preload and jump timing feel more deliberate.
+- HUD interaction polish, restrained entrance/hover feedback, and reduced-motion support.
+
+These are tuning changes rather than a new physics engine. Please run `npm run build` and `npm test` locally before merging; this environment has not executed the browser suite.
