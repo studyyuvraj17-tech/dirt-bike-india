@@ -146,6 +146,12 @@ export class Race {
     this.riders.splice(0, this.riders.length,
       createRiderState(0, 'RIN', 0xe97b45), createRiderState(1, 'JUN', 0x47bfae),
       createRiderState(2, 'KAI', 0xe9bc55), createRiderState(3, 'NIKO', 0xa695d5));
+    let selectedBike:'balanced'|'sprinter'|'freeride'='balanced';
+    try {
+      const garage=JSON.parse(localStorage.getItem('sunbreak.garage.v1')||'null');
+      if(garage?.unlocked?.includes(garage.selected)&&['balanced','sprinter','freeride'].includes(garage.selected))selectedBike=garage.selected;
+    } catch { /* Default bike remains available when storage is disabled. */ }
+    this.player.bikeClass=selectedBike;
     const lanes = [-.95, .95, -.95, .95];
     for (const rider of this.riders) {
       rider.s = rider.id < 2 ? 4 : 1;
