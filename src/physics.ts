@@ -24,7 +24,8 @@ const dynamics = new WeakMap<RiderState, Dynamics>();
 const trickNames = ['', 'TABLETOP', 'X-UP', 'SUPERMAN', 'TAILWHIP', '360', 'BACKFLIP', 'FRONTFLIP'];
 const trickScores = [0, 180, 150, 300, 350, 400, 500, 550];
 const trickDurations = [0, .85, .7, 1.0, .95, 1.08, 1.1, 1.08];
-const grip = { rock: .80, dirt: 1, grass: .67, scree: .62 };
+const grip = { rock: .76, dirt: 1, grass: .61, scree: .54 };
+const rollingResistance = { rock: .82, dirt: .52, grass: 1.05, scree: 1.35 } as const;
 const TAU = Math.PI * 2;
 const clamp = THREE.MathUtils.clamp;
 const damp = THREE.MathUtils.damp;
@@ -97,22 +98,22 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
   const surfaceGrip = grip[before.surface];
   const boosting = input.boost && state.boost > .005;
   if (boosting) state.boost = Math.max(0, state.boost - dt * .18);
-  else state.boost = Math.min(1, state.boost + dt * .009);
+  else state.boost = Math.min(1, state.boost + dt * .012);
 
   // Gravity, rolling losses and aerodynamic drag share units of m/s².
   const downhill = clamp(-before.slope, -.8, .95);
-  const push = input.pedal ? 5.8 : 1.4;
-  const rolling = before.surface === 'scree' ? 1.1 : .65;
+  const push = input.pedal ? 6.1 : .9;
+  const rolling = rollingResistance[before.surface];
   let acceleration = downhill * 17 + push + (boosting ? 11 : 0)
-    - rolling - state.speed * state.speed * .0048;
+    - rolling - state.speed * state.speed * .005;
   if (input.brake) acceleration -= 17 + state.speed * .19;
   if (Math.abs(state.lateral) > before.width * .48) acceleration -= 4.2;
   if (state.airborne) acceleration = (boosting ? 2 : 0) - state.speed * .018;
   state.speed = clamp(state.speed + acceleration * dt, 0, boosting ? 43 : 35);
 
   const steer = clamp(input.steer, -1, 1);
-  const slide = input.brake && state.speed > 12 ? .60 : 1;
-  const steeringTarget = steer * (2.5 + state.speed * .13);
+  const slide = input.brake && state.speed > 12 ? .68 : 1;
+  const steeringTarget = steer * (2.3 + state.speed * .115);
   m.lateralVelocity = damp(m.lateralVelocity, steeringTarget,
     (state.airborne ? 2 : 7 * surfaceGrip * slide), dt);
   // A little centrifugal drift gives berms and brake slides readable consequences.
@@ -138,7 +139,7 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
 
   const crossedLip = before.jump > .62 && sample.jump < .2;
   if (!state.airborne && m.cooldown === 0 && (crossedLip || input.hop || release)) {
-    const launch = crossedLip ? 6.8 : 4.2;
+    const launch = crossedLip ? 7.1 : 4.4;
     state.airborne = true;
     state.airTime = 0;
     state.vy = (crossedLip ? Math.max(-2, before.slope * state.speed) : before.slope * state.speed)
@@ -157,7 +158,7 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
   let targetCompression = input.crouch ? .6 + m.preload * .25 : .12;
   if (state.airborne) {
     state.airTime += dt;
-    state.vy -= 18.5 * dt;
+    state.vy -= 18.0 * dt;
     m.worldY += state.vy * dt;
     state.y = m.worldY - ground;
     targetCompression = .02;
