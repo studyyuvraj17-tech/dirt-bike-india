@@ -234,7 +234,7 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
       const hard=state.speed>28&&Math.abs(state.lateral-rock.lateral)<rock.radius*.6;
       state.speed*=.73;state.compression=.85;m.suspensionVelocity=7;m.cooldown=.5;
       m.lateralVelocity+=(state.lateral>rock.lateral?1:-1)*2;events.push({type:'land',force:13});
-      if(hard){state.crash=1.45;m.recoveryTime=0;m.crashDirection=steer||1;events.push({type:'crash',force:19});}
+      if(hard){state.crash=1.45;m.recoveryTime=0;m.crashDirection=steer||1;state.combo=0;state.comboMultiplier=1;m.comboTimer=0;events.push({type:'crash',force:19});}
       break;
     }
   }
