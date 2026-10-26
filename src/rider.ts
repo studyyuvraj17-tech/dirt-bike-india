@@ -4,8 +4,8 @@ import { addOutline } from './npr';
 import type { MaterialFactory, RiderVisual, RiderState, TrackSample } from './types';
 
 const Y=new THREE.Vector3(0,1,0);
-const sphere=new THREE.SphereGeometry(1,16,12);
-const boneGeo=new THREE.CylinderGeometry(1,1,1,10);
+const sphere=new THREE.SphereGeometry(1,24,18);
+const boneGeo=new THREE.CylinderGeometry(1,1,1,14);
 // Rounded, tapered volumes retain an anatomical silhouette through cel bands.
 function anatomyProfile(points:number[][]){return new THREE.LatheGeometry(points.map(([r,y])=>new THREE.Vector2(r,y)),12);}
 const armGeo=anatomyProfile([[.50,-.5],[.76,-.43],[.91,-.19],[1,.19],[.90,.40],[.53,.5]]);
