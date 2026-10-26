@@ -193,16 +193,20 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
     const pose = Math.sin(Math.min(1, m.trickTime / (trickDurations[m.trickId] || 1)) * Math.PI);
     state.pitch = damp(state.pitch, wheelPitch, 2.5, dt);
     state.roll = damp(state.roll, -steer * .32 + (m.trickId === 1 ? pose * 1.12 : 0), 6, dt);
-    state.yaw = baseYaw;
-    if (m.trickId === 5) state.yaw += trickAngle;
+    // Keep ordinary jumps pointed along the course; a deliberate 360 owns yaw.
+    if (m.trickId === 5) state.yaw = baseYaw + trickAngle;
+    else state.yaw = damp(state.yaw, baseYaw, 2.8, dt);
     // Set absolute flip pitch so the damping cannot fight a completed rotation.
     if (m.trickId === 6) state.pitch = wheelPitch + trickAngle;
     if (m.trickId === 7) state.pitch = wheelPitch - trickAngle;
     if (state.y <= 0 && state.airTime > .10) {
       const impact = Math.max(0, -(state.vy - sample.slope * state.speed));
       const angleError = Math.abs(Math.atan2(Math.sin(state.pitch - wheelPitch), Math.cos(state.pitch - wheelPitch)));
-      // Forgiving ordinary jumps; committing to half a flip has real consequences.
-      const badRotation = (m.trickId === 6 || m.trickId === 7) && angleError > 1.18;
+      const yawError = Math.abs(Math.atan2(Math.sin(state.yaw - baseYaw), Math.cos(state.yaw - baseYaw)));
+      const rollError = Math.abs(state.roll);
+      // Forgiving ordinary jumps, but reward a bike that is level and aligned at touchdown.
+      const badRotation = ((m.trickId === 6 || m.trickId === 7) && angleError > 1.18)
+        || (m.trickId !== 5 && (rollError > 1.05 || yawError > 1.35));
       state.airborne = false; state.y = 0; state.vy = 0; m.worldY = ground;
       // A landing is a suspension impulse, not an instant visual snap. Softer
       // grass absorbs a little more travel; rock transfers a sharper hit.
@@ -216,7 +220,7 @@ export function updatePhysics(state: RiderState, input: InputState, world: World
         m.pendingScore = 0; state.trick = 'WIPEOUT'; state.combo = 0; state.comboMultiplier = 1; m.comboTimer = 0;
         events.push({ type: 'crash', force: impact });
       } else {
-        const clean = angleError < .5;
+        const clean = angleError < .5 && rollError < .48 && (m.trickId === 5 || yawError < .55);
         state.speed *= clean ? .995 : .86;
         if (m.pendingScore > 0) {
           if (m.comboTimer > 0) state.combo += 1; else state.combo = 1;
