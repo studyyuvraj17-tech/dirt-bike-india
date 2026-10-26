@@ -58,7 +58,7 @@ const ghostState=snapshot(race.player);
 const shadowGeo=new THREE.CircleGeometry(1,20);shadowGeo.rotateX(-Math.PI/2);
 const shadows=new THREE.InstancedMesh(shadowGeo,createMaterial(0x53654b,'shadow'),4);
 shadows.frustumCulled=false;scene.add(shadows);const shadowTransform=new THREE.Object3D();
-const playerLabel=document.createElement('div');playerLabel.className='player-label';playerLabel.innerHTML='▼';document.body.append(playerLabel);const labelPosition=new THREE.Vector3();
+const playerLabel=document.createElement('div');playerLabel.className='player-label';playerLabel.setAttribute('aria-hidden','true');document.body.append(playerLabel);const labelPosition=new THREE.Vector3();
 presentation=new Presentation(scene,camera,world,createMaterial);
 pipeline=new NPRPipeline(renderer,scene,camera);resize();hud.setEffects(enhancedEffects,rainWeather);
 let ghostIndex=0;
@@ -108,8 +108,7 @@ function render(dt:number,draw=true){
   const fx=pipeline.effects;fx.enabled=enhancedEffects;fx.rain=THREE.MathUtils.damp(fx.rain,rainWeather?1:0,2,effectDt);fx.wetness=lensWetness;
   labelPosition.copy(shown.position);labelPosition.y+=1.1;fx.focusDistance=labelPosition.distanceTo(camera.position);labelPosition.project(camera);
   fx.focusX=labelPosition.x*.5+.5;fx.focusY=labelPosition.y*.5+.5;fx.cinematic=replay||mode==='side'||mode==='front'?1:0;
-  labelPosition.copy(shown.position);labelPosition.y+=2.5;labelPosition.project(camera);
-  playerLabel.style.display=race.phase==='racing'&&!replay&&labelPosition.z<1?'block':'none';playerLabel.style.left=`${(labelPosition.x*.5+.5)*innerWidth}px`;playerLabel.style.top=`${(-labelPosition.y*.5+.5)*innerHeight}px`;
+  playerLabel.style.display='none';
   world.update(camera,dt);
   pendingRenderTime+=effectDt;if(draw){renderer.info.reset();pipeline.render(pendingRenderTime,active?shown.speed:0,input.boost&&shown.boost>0?1:0,impact);pendingRenderTime=0;}
   perf.drawCalls=renderer.info.render.calls;perf.triangles=renderer.info.render.triangles;
