@@ -84,3 +84,71 @@
 
 /* Garage progression and readable trick-chain feedback. */
 .garage-btn{display:flex;align-items:center;justify-content:space-between;width:335px;border:1px solid #244b3d55;background:#f1e8cd80;color:#21483f;padding:10px 13px;margin:-7px 0 15px;font-size:9px;font-weight:900;letter-spacing:1.5px}.garage-btn span{font-size:16px}.garage-btn:hover{background:#fff0cd}.combo-panel{font-size:9px;letter-spacing:1.3px;font-weight:900;min-height:15px;margin-top:5px;color:#ffcf78;text-shadow:1px 1px #173d37}.combo-panel.active{animation:combo-pop .24s ease-out both;color:#ffb66b}@keyframes combo-pop{from{transform:scale(1.25);opacity:.5}to{transform:scale(1);opacity:1}}.garage-modal{max-height:88vh;overflow:auto}.garage-modal h2{margin-bottom:14px}.garage-intro{font-size:11px;line-height:1.7;margin:0 0 18px;opacity:.72}.garage-option{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:13px 0;border-top:1px solid #fff0cd25}.garage-option.selected{border-top-color:#ed804b}.garage-option>div{min-width:0}.garage-option>div>b,.garage-option>div>span,.garage-option>div>small{display:block}.garage-option>div>b{font-size:12px;letter-spacing:1px}.garage-option>div>span{font-size:8px;letter-spacing:1px;color:#f2bb79;margin-top:5px}.garage-option>div>small{font-size:9px;opacity:.65;margin-top:5px;line-height:1.4}.garage-option button{flex-shrink:0;border:1px solid #f1c28266;background:#f1b96b;color:#173d37;font-size:8px;font-weight:900;letter-spacing:.6px;padding:9px 10px;min-width:94px}.garage-option.selected button{background:#244f43;color:#fff0cd}.garage-message{min-height:16px;color:#f2bb79;font-size:9px;letter-spacing:1px;margin-top:13px}.garage-modal .text-btn{margin-top:14px}@media(max-width:800px){.garage-btn{width:min(100%,335px);padding:9px 11px;margin:-5px 0 12px}.garage-option{gap:7px}.garage-option>div>b{font-size:10px}.garage-option button{min-width:82px;padding:8px 6px;font-size:7px}.garage-modal{padding:24px!important}.garage-modal h2{font-size:45px}}
+
+
+/* Home screen layout fix: keep the complete call-to-action stack inside the viewport
+   and separate headline contrast from the busy 3D forest behind it. */
+@media (min-width: 801px) {
+  .title-panel {
+    top: 17%;
+    left: 6.1%;
+    width: 440px;
+    padding: 18px 18px 16px 0;
+    isolation: isolate;
+  }
+  .title-panel::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -22px -34px -16px -22px;
+    background: linear-gradient(90deg, #d8dfbded 0%, #d8dfbddb 70%, #d8dfbd00 100%);
+    pointer-events: none;
+  }
+  .title-panel h1 {
+    font-size: clamp(58px, 5.1vw, 76px);
+    line-height: .88;
+    letter-spacing: -4px;
+    margin: 16px 0 12px;
+  }
+  .title-panel h1 em { letter-spacing: -3.5px; }
+  .title-panel > p { margin: 12px 0 20px; font-size: 12px; }
+  .course-card { width: 325px; padding-top: 11px; }
+  .course-stats { margin: 14px 0 17px; gap: 23px; }
+  .course-stats b { font-size: 20px; }
+  .daily-card { width: 325px; margin: 0 0 12px; padding: 10px 12px; }
+  .garage-btn { width: 325px; margin: 0 0 11px; padding: 8px 12px; }
+  .title-panel > .ride-btn { width: 325px; height: 52px; }
+  .title-hint { display: none; }
+}
+@media (min-width: 801px) and (max-height: 760px) {
+  .title-panel { top: 13%; }
+  .title-panel h1 { font-size: 58px; margin: 12px 0 9px; }
+  .title-panel > p { margin: 8px 0 14px; }
+  .course-stats { margin: 10px 0 12px; }
+  .daily-card { padding: 8px 11px; margin-bottom: 9px; }
+  .daily-card p { margin: 3px 0 5px; }
+  .garage-btn { margin-bottom: 8px; }
+}
+@media (max-width: 800px) {
+  .title-panel {
+    top: 12%;
+    bottom: 12px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 8px;
+    scrollbar-width: thin;
+  }
+  .title-panel::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -12px -12px -10px -12px;
+    background: linear-gradient(90deg, #d8dfbdf2 0%, #d8dfbde3 75%, #d8dfbd16 100%);
+    pointer-events: none;
+  }
+  .title-panel h1 { line-height: .88; letter-spacing: -3px; }
+  .title-panel h1 em { letter-spacing: -2.5px; }
+  .course-card { max-width: 100%; }
+  .course-stats { gap: clamp(12px, 4vw, 22px); }
+  .daily-card, .garage-btn, .title-panel > .ride-btn { width: min(100%, 335px); }
+}
