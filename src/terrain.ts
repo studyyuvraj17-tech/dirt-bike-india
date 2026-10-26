@@ -123,7 +123,12 @@ export function createWorld(materialFactory: MaterialFactory): World {
     position.y+=Math.max(0,-Math.sign(turn)*lateral)*Math.min(Math.abs(turn)*.19,.08);
     if(Math.abs(lateral)>4.4)position.y=THREE.MathUtils.lerp(position.y,height(position.x,position.z),smooth(4.4,9,Math.abs(lateral)));
     const section=Math.min(8,Math.floor(clamped/length*9));
-    return {position,tangent,right,slope:tangent.y/Math.max(.1,Math.hypot(tangent.x,tangent.z)),width:section===5?6.2:7.6,surface:section===0?'rock':section===1?'scree':section===3?'rock':'dirt',section:sectionNames[section],curvature:turn/(14*ds),jump:j.amount};
+    // Keep the authored riding line predictable, but make the trail shoulders
+    // feel meaningfully different: grass has less bite and sheds more speed.
+    // Razor Ridge is loose scree; the Rock Garden and Divide are hard rock.
+    const shoulder=Math.abs(lateral)>5.15;
+    const surface:TrackSample['surface']=shoulder?'grass':section===0||section===3||section===6?'rock':section===1||section===5?'scree':'dirt';
+    return {position,tangent,right,slope:tangent.y/Math.max(.1,Math.hypot(tangent.x,tangent.z)),width:section===5?6.2:7.6,surface,section:sectionNames[section],curvature:turn/(14*ds),jump:j.amount};
   }
 
   // Nested, camera-centred grids are updated one ring per frame. Ring skirts
