@@ -21,6 +21,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
+    "deploy:pages": "npm run build && npx wrangler pages deploy dist --project-name=dirt-bike-india",
     "capture": "node scripts/capture.mjs",
     "test": "node scripts/test.mjs",
     "capture:motion": "node scripts/motion.mjs",
