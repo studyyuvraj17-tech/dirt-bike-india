@@ -111,7 +111,7 @@ export function createMaterial(color:number,kind='dirt'):THREE.ShaderMaterial {
     vertexColors: kind==='terrain',
     uniforms:{...globalUniforms,uColor:{value:new THREE.Color(color)},uRamp:{value:rampFor(kind)},
       uThresholds:{value:new THREE.Vector3(kind==='foliage'?0.28:0.32,0.56,kind==='rock'?0.78:0.76)},
-      uTrackMask:{value:null},uMasked:{value:0},uTrackRegion:{value:new THREE.Vector4(-1600,-2400,3200,3200)},uReflect:{value:shiny?.65:kind==='water'?.5:0},uRim:{value:rider?0.10:0.018},uSpec:{value:shiny?0.24:0},uHatch:{value:kind==='skin'?0.012:kind==='terrain'?0.018:0.025}},
+      uTrackMask:{value:null},uMasked:{value:0},uTrackRegion:{value:new THREE.Vector4(-1600,-2400,3200,3200)},uReflect:{value:shiny?.65:kind==='water'?.5:0},uRim:{value:rider?0.10:0.018},uSpec:{value:shiny?0.24:0},uHatch:{value:kind==='skin'?0:kind==='terrain'?0.004:0.006}},
     side:kind==='foliage'||kind==='grass'?THREE.DoubleSide:THREE.FrontSide,
   });
 }
